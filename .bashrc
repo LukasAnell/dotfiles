@@ -23,3 +23,9 @@ alias dotfiles='git --git-dir=/home/lukas/.dotfiles/ --work-tree=/home/lukas'
 eval "$(starship init bash)"
 source /usr/share/fzf/key-bindings.bash
 source /usr/share/fzf/key-bindings.bash
+export GTK_IM_MODULE=fcitx
+export QT_IM_MODULE=fcitx
+export XMODIFIERS=@im=fcitx
+
+# C++
+alias g++='g++ -std=c++23 -Wall -Werror'
