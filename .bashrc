@@ -29,3 +29,6 @@ export XMODIFIERS=@im=fcitx
 
 # C++
 alias g++='g++ -std=c++23 -Wall -Werror'
+
+# Java
+alias javac='javac -Xlint:all -Werror'
