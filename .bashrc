@@ -28,7 +28,7 @@ export QT_IM_MODULE=fcitx
 export XMODIFIERS=@im=fcitx
 
 # C++
-alias g++='g++ -std=c++23 -Wall -Werror'
+alias g++='g++ -std=c++23 -Wall -Werror -Wpedantic -Wconversion -Wshadow'
 
 # Java
 alias javac='javac -Xlint:all -Werror'
