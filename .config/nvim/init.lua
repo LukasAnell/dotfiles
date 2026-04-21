@@ -26,6 +26,7 @@ require("lazy").setup({
   { "folke/tokyonight.nvim" },
   { "williamboman/mason.nvim" },
   { "williamboman/mason-lspconfig.nvim" },
+  { "MaximilianLloyd/lazy-reload.nvim", opts = {} },
 })
 
 vim.cmd("colorscheme tokyonight")
@@ -57,3 +58,4 @@ vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.softtabstop = 4
 vim.opt.expandtab = false
+vim.opt.clipboard = "unnamedplus"
