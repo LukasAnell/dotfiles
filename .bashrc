@@ -30,6 +30,7 @@ export XMODIFIERS=@im=fcitx
 # git
 alias gs='git status -sb'
 alias gl='git log --all --decorate --oneline --graph'
+alias gp='git push'
 
 # C++
 alias g++='g++ -std=c++23 -Wall -Werror -Wpedantic -Wconversion -Wshadow'
