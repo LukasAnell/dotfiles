@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Bitwarden
-Exec=/opt/bitwarden/Bitwarden.AppImage
+Exec=bash -c "sleep 5 && /opt/bitwarden/Bitwarden.AppImage"
 Hidden=false
 NoDisplay=false
 X-GNOME-Autostart-enabled=true
