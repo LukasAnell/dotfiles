@@ -33,6 +33,7 @@ alias gl='git log --all --decorate --oneline --graph'
 alias gp='git push'
 alias gi='git init -b main'
 alias gau='git add -u'
+alias gap='git add -p'
 alias gds='git diff --staged'
 alias gcm='git commit -m'
 
