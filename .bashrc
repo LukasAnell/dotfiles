@@ -14,15 +14,19 @@ if [[ $- != *i* ]] ; then
 	return
 fi
 
-
-# Put your fun stuff here.
-
 . "$HOME/.local/bin/env"
+
+# Use Bitwarden's SSH Agent
 export SSH_AUTH_SOCK="$HOME/.bitwarden-ssh-agent.sock"
+
+# dotfiles repository
 alias dotfiles='git --git-dir=/home/lukas/.dotfiles/ --work-tree=/home/lukas'
+
 eval "$(starship init bash)"
+
 source /usr/share/fzf/key-bindings.bash
 source /usr/share/fzf/key-bindings.bash
+
 export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=fcitx
 export XMODIFIERS=@im=fcitx
