@@ -1,7 +1,9 @@
 [Desktop Entry]
-Type=Application
-Name=Bitwarden
-Exec=bash -c "sleep 5 && /opt/bitwarden/Bitwarden.AppImage"
-Hidden=false
-NoDisplay=false
-X-GNOME-Autostart-enabled=true
+  Type=Application
+  Version=2026.4.0
+  Name=Bitwarden
+  Comment=Bitwarden startup script
+  Exec=/tmp/.mount_BitwarC8iC86/bitwarden-app
+  StartupNotify=false
+  Terminal=false
+  -X-GNOME-Autostart-enabled=true

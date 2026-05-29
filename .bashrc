@@ -16,8 +16,9 @@ fi
 
 . "$HOME/.local/bin/env"
 
-# Use Bitwarden's SSH Agent
+# Bitwarden
 export SSH_AUTH_SOCK="$HOME/.bitwarden-ssh-agent.sock"
+alias restart-bitwarden="pkill -f bitwarden-app; sleep 2; nohup /opt/bitwarden/Bitwarden.AppImage > /dev/null 2>&1 & disown"
 
 # dotfiles repository
 alias dotfiles='git --git-dir=/home/lukas/.dotfiles/ --work-tree=/home/lukas'
