@@ -1,0 +1,5 @@
+[c]
+detect_extensions = ["c", "h", "cpp", "hpp", "cc", "cxx"]
+
+[java]
+detect_extensions = ["java"]
