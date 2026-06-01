@@ -3,7 +3,6 @@
   Version=2026.4.0
   Name=Bitwarden
   Comment=Bitwarden startup script
-  Exec=/tmp/.mount_BitwarRe3z63/bitwarden-app
+  Exec=/tmp/.mount_BitwarvSrVE9/bitwarden-app
   StartupNotify=false
   Terminal=false
-  X-GNOME-Autostart-enabled=true
