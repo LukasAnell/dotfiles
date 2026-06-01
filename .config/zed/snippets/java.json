@@ -1,0 +1,13 @@
+{
+    "javadoc_method": {
+        "prefix": "jdoc",
+        "body": [
+            "/**",
+            " * ${1:Description}",
+            " *",
+            " * @param ${2:param} ${3:description}",
+            " * @return ${4:return_type}",
+            " */"
+        ]
+    }
+}

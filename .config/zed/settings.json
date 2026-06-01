@@ -1,0 +1,89 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+    "languages": {
+        "C++": {
+            "enable_language_server": true,
+        },
+        "Python": {
+            "enable_language_server": true,
+        },
+    },
+    "show_whitespaces": "boundary",
+    "tab_size": 4,
+    "hard_tabs": false,
+    "git_panel": {
+        "tree_view": true,
+        "dock": "right",
+    },
+    "collaboration_panel": {
+        "dock": "right",
+    },
+    "disable_ai": false,
+    "active_pane_modifiers": {
+        "border_size": 0.0,
+    },
+    "tabs": {
+        "git_status": false,
+    },
+    "title_bar": {
+        "show_menus": true,
+        "show_branch_icon": false,
+    },
+    "status_bar": {
+        "active_encoding_button": "non_utf8",
+    },
+    "ui_font_family": "Noto Sans",
+    "buffer_font_family": "Noto Sans Mono",
+    "agent": {
+        "default_profile": "ask",
+        "profiles": {},
+        "enable_feedback": false,
+        "default_model": {
+            "provider": "copilot_chat",
+            "model": "gpt-5.2-codex",
+            "enable_thinking": false,
+            "effort": "high",
+        },
+        "favorite_models": [],
+        "model_parameters": [],
+    },
+    "edit_predictions": {
+        "copilot": {
+            "enable_next_edit_suggestions": false,
+        },
+        "mode": "subtle",
+        "provider": "copilot",
+    },
+    "telemetry": {
+        "diagnostics": false,
+        "metrics": false,
+    },
+    "vim_mode": true,
+    "base_keymap": "JetBrains",
+    "ui_font_size": 16,
+    "buffer_font_size": 15.0,
+    "theme": {
+        "mode": "system",
+        "light": "One Dark",
+        "dark": "One Dark",
+    },
+    "lsp": {
+        "clangd": {
+            "initialization_options": {
+                "fallbackFlags": ["-std=c++23"],
+            },
+        },
+        "jdtls": {
+            "settings": {
+                "java_home": "/etc/java-config-2/current-system-vm",
+            },
+        },
+    },
+}
