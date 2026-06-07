@@ -31,6 +31,9 @@ export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=fcitx
 export XMODIFIERS=@im=fcitx
 
+# bash
+alias maintenance='sudo ~/.local/bin/maintenance'
+
 # git
 alias gs='git status -sb'
 alias gl='git log --all --decorate --oneline --graph'
