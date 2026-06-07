@@ -1,0 +1,105 @@
+#!/bin/bash
+# healthcheck — quick system health snapshot
+# Checks: failed units, drive health, disk usage, restic backup status
+set -uo pipefail
+
+# ── Colors ────────────────────────────────────────────────────────────────────
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+ok()     { echo -e "${GREEN}✔${NC}  $*"; }
+warn()   { echo -e "${YELLOW}⚠${NC}  $*"; WARNINGS+=("$*"); }
+fail()   { echo -e "${RED}✘${NC}  $*"; ERRORS+=("$*"); }
+info()   { echo -e "${CYAN}→${NC}  $*"; }
+header() { echo -e "\n${BOLD}${CYAN}══ $* ══${NC}"; }
+
+ERRORS=()
+WARNINGS=()
+
+echo -e "${BOLD}System Health Check — $(date '+%Y-%m-%d %H:%M')${NC}"
+
+# ── 1. Failed systemd units ───────────────────────────────────────────────────
+header "Systemd units"
+FAILED=$(systemctl --failed --no-legend --no-pager 2>/dev/null | grep -v '^$' || true)
+if [[ -z "$FAILED" ]]; then
+    ok "No failed units"
+else
+    fail "Failed units detected:"
+    echo "$FAILED"
+fi
+
+# ── 2. Drive health ───────────────────────────────────────────────────────────
+header "Drive health"
+if ! command -v smartctl &>/dev/null; then
+    warn "smartmontools not found — skipping drive check"
+else
+    SMART_RESULT=$(sudo smartctl -H /dev/nvme0n1 2>/dev/null | grep 'SMART overall-health' || true)
+    if echo "$SMART_RESULT" | grep -q 'PASSED'; then
+        TEMP=$(sudo smartctl -a /dev/nvme0n1 2>/dev/null \
+            | grep '^Temperature:' | awk '{print $2, $3}')
+        ok "NVMe SMART: PASSED${TEMP:+ (${TEMP})}"
+    else
+        fail "NVMe SMART check failed or inconclusive — run: sudo smartctl -a /dev/nvme0n1"
+    fi
+fi
+
+# ── 3. Disk usage ─────────────────────────────────────────────────────────────
+header "Disk usage"
+ROOT_USE=$(df -h / | awk 'NR==2 {print $3 " used of " $2 " (" $5 ")"}')
+ROOT_PCT=$(df / | awk 'NR==2 {print $5}' | tr -d '%')
+info "/ → $ROOT_USE"
+if [[ $ROOT_PCT -ge 90 ]]; then
+    fail "Root partition above 90% full"
+elif [[ $ROOT_PCT -ge 75 ]]; then
+    warn "Root partition above 75% full"
+else
+    ok "Disk usage healthy"
+fi
+
+# ── 4. Restic backup status ───────────────────────────────────────────────────
+header "Restic backups"
+RESTIC_STATUS=$(systemctl show restic-backup.service \
+    --property=ActiveState,Result,ExecMainStatus 2>/dev/null || true)
+ACTIVE=$(echo "$RESTIC_STATUS" | grep 'ActiveState' | cut -d= -f2)
+RESULT=$(echo "$RESTIC_STATUS" | grep '^Result' | cut -d= -f2)
+
+if [[ "$RESULT" == "success" ]]; then
+    # Get last snapshot date from restic
+    LAST_SNAP=$(restic \
+        -r sftp:root@proxmox:/mnt/backup/restic/gentoo-laptop \
+        --password-file=/home/lukas/.restic-password \
+        snapshots --last --json 2>/dev/null \
+        | python3 -c "
+import sys, json
+snaps = json.load(sys.stdin)
+if snaps:
+    print(snaps[-1]['time'][:10])
+" 2>/dev/null || true)
+    if [[ -n "$LAST_SNAP" ]]; then
+        ok "Last backup: $LAST_SNAP"
+    else
+        ok "Last backup run succeeded (snapshot date unavailable — Tailscale may be down)"
+    fi
+elif [[ "$ACTIVE" == "failed" ]]; then
+    fail "Restic backup service failed — run: journalctl -u restic-backup.service -n 20"
+else
+    warn "Restic backup status: $RESULT (may not have run yet today)"
+fi
+
+# ── Summary ───────────────────────────────────────────────────────────────────
+header "Summary"
+if [[ ${#ERRORS[@]} -eq 0 && ${#WARNINGS[@]} -eq 0 ]]; then
+    echo -e "${GREEN}${BOLD}All checks passed.${NC}"
+elif [[ ${#ERRORS[@]} -eq 0 ]]; then
+    echo -e "${YELLOW}${BOLD}${#WARNINGS[@]} warning(s):${NC}"
+    for w in "${WARNINGS[@]}"; do echo -e "  ${YELLOW}•${NC} $w"; done
+else
+    echo -e "${RED}${BOLD}${#ERRORS[@]} error(s), ${#WARNINGS[@]} warning(s):${NC}"
+    for e in "${ERRORS[@]}"; do echo -e "  ${RED}•${NC} $e"; done
+    for w in "${WARNINGS[@]}"; do echo -e "  ${YELLOW}•${NC} $w"; done
+    exit 1
+fi

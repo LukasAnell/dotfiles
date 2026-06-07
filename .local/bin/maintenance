@@ -1,0 +1,103 @@
+#!/bin/bash
+# maintenance — full Gentoo maintenance pass
+# Runs: portage sync, world update, depclean, eclean-dist, failed units check, drive health
+set -uo pipefail
+
+# ── Colors ────────────────────────────────────────────────────────────────────
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+NC='\033[0m'
+
+ok()   { echo -e "${GREEN}✔${NC}  $*"; }
+fail() { echo -e "${RED}✘${NC}  $*"; ERRORS+=("$*"); }
+info() { echo -e "${CYAN}→${NC}  $*"; }
+header() { echo -e "\n${BOLD}${CYAN}══ $* ══${NC}"; }
+
+ERRORS=()
+
+# ── Root check ────────────────────────────────────────────────────────────────
+if [[ $EUID -ne 0 ]]; then
+    echo -e "${RED}Run with sudo.${NC}"
+    exit 1
+fi
+
+echo -e "${BOLD}Gentoo Maintenance — $(date '+%Y-%m-%d %H:%M')${NC}"
+
+# ── 1. Sync portage tree ──────────────────────────────────────────────────────
+header "Sync portage tree"
+if emerge --sync --quiet; then
+    ok "Portage tree synced"
+else
+    fail "emerge --sync failed"
+fi
+
+# ── 2. World update ───────────────────────────────────────────────────────────
+header "World update"
+info "Checking for updates..."
+UPDATE_LIST=$(emerge -pvuDN @world 2>&1)
+UPDATE_COUNT=$(echo "$UPDATE_LIST" | grep -c '^\[ebuild' || true)
+
+if [[ $UPDATE_COUNT -eq 0 ]]; then
+    ok "System already up to date"
+else
+    info "$UPDATE_COUNT package(s) to update — starting merge"
+    if emerge -uDN --keep-going @world; then
+        ok "World update complete"
+    else
+        fail "World update finished with errors — check emerge output above"
+    fi
+fi
+
+# ── 3. Depclean ───────────────────────────────────────────────────────────────
+header "Depclean"
+DEPCLEAN_OUT=$(emerge --depclean 2>&1)
+REMOVED=$(echo "$DEPCLEAN_OUT" | grep 'Number removed:' | awk '{print $NF}')
+if [[ "${REMOVED:-0}" -gt 0 ]]; then
+    ok "Removed $REMOVED orphaned package(s)"
+else
+    ok "No orphaned packages"
+fi
+
+# ── 4. Clean distfiles ────────────────────────────────────────────────────────
+header "Clean distfiles"
+ECLEAN_OUT=$(eclean-dist --deep 2>&1)
+FREED=$(echo "$ECLEAN_OUT" | grep 'Total space' | grep -oP '[\d.]+ \w+(?= from)')
+if [[ -n "$FREED" ]]; then
+    ok "Freed $FREED in distfiles"
+else
+    ok "Distfiles already clean"
+fi
+
+# ── 5. Failed systemd units ───────────────────────────────────────────────────
+header "Systemd units"
+FAILED=$(systemctl --failed --no-legend --no-pager 2>/dev/null | grep -v '^$' || true)
+if [[ -z "$FAILED" ]]; then
+    ok "No failed units"
+else
+    fail "Failed units detected:"
+    echo "$FAILED"
+fi
+
+# ── 6. Drive health ───────────────────────────────────────────────────────────
+header "Drive health"
+SMART_RESULT=$(smartctl -H /dev/nvme0n1 2>/dev/null | grep 'SMART overall-health' || true)
+if echo "$SMART_RESULT" | grep -q 'PASSED'; then
+    ok "NVMe SMART: PASSED"
+else
+    fail "NVMe SMART check failed or inconclusive — run: sudo smartctl -a /dev/nvme0n1"
+fi
+
+# ── Summary ───────────────────────────────────────────────────────────────────
+header "Summary"
+if [[ ${#ERRORS[@]} -eq 0 ]]; then
+    echo -e "${GREEN}${BOLD}All checks passed.${NC}"
+else
+    echo -e "${RED}${BOLD}${#ERRORS[@]} issue(s) need attention:${NC}"
+    for e in "${ERRORS[@]}"; do
+        echo -e "  ${RED}•${NC} $e"
+    done
+    exit 1
+fi
