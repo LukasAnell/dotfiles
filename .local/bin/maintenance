@@ -1,6 +1,6 @@
 #!/bin/bash
 # maintenance — full Gentoo maintenance pass
-# Runs: portage sync, world update, depclean, eclean-dist, failed units check, drive health
+# Runs: portage sync, world update, depclean, eclean-dist, failed units check, drive health, backup status
 set -uo pipefail
 
 # ── Colors ────────────────────────────────────────────────────────────────────
@@ -11,9 +11,9 @@ CYAN='\033[0;36m'
 BOLD='\033[1m'
 NC='\033[0m'
 
-ok()   { echo -e "${GREEN}✔${NC}  $*"; }
-fail() { echo -e "${RED}✘${NC}  $*"; ERRORS+=("$*"); }
-info() { echo -e "${CYAN}→${NC}  $*"; }
+ok()     { echo -e "${GREEN}✔${NC}  $*"; }
+fail()   { echo -e "${RED}✘${NC}  $*"; ERRORS+=("$*"); }
+info()   { echo -e "${CYAN}→${NC}  $*"; }
 header() { echo -e "\n${BOLD}${CYAN}══ $* ══${NC}"; }
 
 ERRORS=()
@@ -88,6 +88,22 @@ if echo "$SMART_RESULT" | grep -q 'PASSED'; then
     ok "NVMe SMART: PASSED"
 else
     fail "NVMe SMART check failed or inconclusive — run: sudo smartctl -a /dev/nvme0n1"
+fi
+
+# ── 7. Restic backup status ───────────────────────────────────────────────────
+header "Restic backups"
+RESTIC_STATUS=$(systemctl show restic-backup.service --property=ActiveState,Result 2>/dev/null)
+ACTIVE=$(echo "$RESTIC_STATUS" | grep 'ActiveState=' | cut -d= -f2)
+RESULT=$(echo "$RESTIC_STATUS" | grep 'Result=' | cut -d= -f2)
+
+if [[ "$RESULT" == "success" ]]; then
+    LAST_RUN=$(systemctl show restic-backup.service --property=ExecMainStartTimestamp \
+        | cut -d= -f2 | cut -d' ' -f1)
+    ok "Last backup: ${LAST_RUN:-unknown date}"
+elif [[ "$ACTIVE" == "activating" || "$ACTIVE" == "active" ]]; then
+    info "Backup currently running"
+else
+    fail "Last backup did not succeed (Result=${RESULT}) — run: sudo systemctl start restic-backup.service"
 fi
 
 # ── Summary ───────────────────────────────────────────────────────────────────
