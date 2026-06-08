@@ -97,9 +97,9 @@ ACTIVE=$(echo "$RESTIC_STATUS" | grep 'ActiveState=' | cut -d= -f2)
 RESULT=$(echo "$RESTIC_STATUS" | grep 'Result=' | cut -d= -f2)
 
 if [[ "$RESULT" == "success" ]]; then
-    LAST_RUN=$(systemctl show restic-backup.service --property=ExecMainStartTimestamp \
-        | cut -d= -f2 | cut -d' ' -f1)
-    ok "Last backup: ${LAST_RUN:-unknown date}"
+    LAST_RUN=$(journalctl -u restic-backup.service --no-pager -n 1 --output=short \
+        | grep -oP '\w+ \d+ \d+:\d+:\d+')
+    ok "Last backup: ${LAST_RUN:-unknown}"
 elif [[ "$ACTIVE" == "activating" || "$ACTIVE" == "active" ]]; then
     info "Backup currently running"
 else
