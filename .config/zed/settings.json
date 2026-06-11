@@ -42,13 +42,13 @@
     "ui_font_family": "Noto Sans",
     "buffer_font_family": "Noto Sans Mono",
     "agent": {
-        "default_profile": "ask",
+        "default_profile": "write",
         "profiles": {},
-        "enable_feedback": false,
+        "enable_feedback": true,
         "default_model": {
             "provider": "copilot_chat",
-            "model": "gpt-5.2-codex",
-            "enable_thinking": false,
+            "model": "gpt-5-mini",
+            "enable_thinking": true,
             "effort": "high",
         },
         "favorite_models": [],
@@ -83,6 +83,28 @@
         "jdtls": {
             "settings": {
                 "java_home": "/etc/java-config-2/current-system-vm",
+            },
+        },
+        "pyright": {
+            "settings": {
+                "python": {
+                    "pythonPath": ".venv/bin/python",
+                },
+            },
+        },
+        "basedpyright": {
+            "settings": {
+                "python": {
+                    "pythonPath": ".venv/bin/python",
+                },
+            },
+        },
+    },
+    "terminal": {
+        "detect_venv": {
+            "on": {
+                "directories": [".venv", "venv", ".env", "env"],
+                "activate_script": "default",
             },
         },
     },
