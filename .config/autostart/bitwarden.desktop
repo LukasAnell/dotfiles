@@ -3,6 +3,6 @@
   Version=2026.4.0
   Name=Bitwarden
   Comment=Bitwarden startup script
-  Exec=/tmp/.mount_BitwarNb7NxA/bitwarden-app
+  Exec=/tmp/.mount_Bitwarbw9ekl/bitwarden-app
   StartupNotify=false
   Terminal=false

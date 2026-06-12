@@ -43,8 +43,11 @@ UPDATE_COUNT=$(echo "$UPDATE_LIST" | grep -c '^\[ebuild' || true)
 if [[ $UPDATE_COUNT -eq 0 ]]; then
     ok "System already up to date"
 else
-    info "$UPDATE_COUNT package(s) to update — starting merge"
-    if emerge -uDN --keep-going @world; then
+    info "$UPDATE_COUNT package(s) to update:"
+    echo "$UPDATE_LIST"
+    echo ""
+    emerge -uDN --keep-going --ask @world
+    if [[ $? -eq 0 ]]; then
         ok "World update complete"
     else
         fail "World update finished with errors — check emerge output above"
