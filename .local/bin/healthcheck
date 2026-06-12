@@ -60,6 +60,15 @@ else
     ok "Disk usage healthy"
 fi
 
+# ── Battery health trend ──────────────────────────────────────────────────────
+header "Battery health"
+BATLOG="/home/lukas/.local/share/battery-health.log"
+if [[ -f "$BATLOG" ]]; then
+    tail -7 "$BATLOG"
+else
+    info "No data yet — battery-log.timer will populate this daily"
+fi
+
 # ── 4. Restic backup status ───────────────────────────────────────────────────
 header "Restic backups"
 RESTIC_STATUS=$(systemctl show restic-backup.service \
