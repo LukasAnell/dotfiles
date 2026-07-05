@@ -7,6 +7,12 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+    "project_panel": {
+        "dock": "left"
+    },
+    "outline_panel": {
+        "dock": "left"
+    },
     "languages": {
         "C++": {
             "enable_language_server": true,
@@ -42,6 +48,7 @@
     "ui_font_family": "Noto Sans",
     "buffer_font_family": "Noto Sans Mono",
     "agent": {
+        "dock": "right",
         "default_profile": "write",
         "profiles": {},
         "enable_feedback": true,
