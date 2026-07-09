@@ -7,6 +7,20 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+    "context_servers": {
+        "mcp-server-markitdown": {
+            "enabled": true,
+            "remote": false,
+            "settings": {
+                "package_version": "latest"
+            }
+        }
+    },
+    "agent_servers": {
+        "github-copilot-cli": {
+            "type": "registry"
+        }
+    },
     "project_panel": {
         "dock": "left"
     },
@@ -40,7 +54,6 @@
     },
     "title_bar": {
         "show_menus": true,
-        "show_branch_icon": false,
     },
     "status_bar": {
         "active_encoding_button": "non_utf8",
