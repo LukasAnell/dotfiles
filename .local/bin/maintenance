@@ -68,10 +68,23 @@ fi
 header "Clean distfiles"
 ECLEAN_OUT=$(eclean-dist --deep 2>&1)
 FREED=$(echo "$ECLEAN_OUT" | grep 'Total space' | grep -oP '[\d.]+ \w+(?= from)')
+FILES_REMOVED=$(echo "$ECLEAN_OUT" | grep -oP '(?<=Cleaning distfiles: )\d+' || echo "0")
 if [[ -n "$FREED" ]]; then
-    ok "Freed $FREED in distfiles"
+    ok "Freed $FREED in distfiles ($FILES_REMOVED file(s) removed)"
 else
     ok "Distfiles already clean"
+fi
+
+# ── 4b. Stale portage build directories ───────────────────────────────────────
+header "Stale portage build dirs"
+STALE_TMP=$(find /var/tmp/portage -mindepth 1 -maxdepth 1 -mtime +1 2>/dev/null)
+if [[ -z "$STALE_TMP" ]]; then
+    ok "No stale build directories"
+else
+    STALE_SIZE=$(du -sh $STALE_TMP 2>/dev/null | awk '{sum=$1} END{print sum}')
+    fail "Stale build dir(s) found (>1 day old, possibly from an interrupted build):"
+    echo "$STALE_TMP"
+    info "Review and remove manually with: sudo rm -rf <path>"
 fi
 
 # ── 5. Failed systemd units ───────────────────────────────────────────────────
