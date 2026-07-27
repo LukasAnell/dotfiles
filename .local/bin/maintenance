@@ -82,8 +82,7 @@ if [[ -z "$STALE_TMP" ]]; then
     ok "No stale build directories"
 else
     STALE_SIZE=$(du -sh $STALE_TMP 2>/dev/null | awk '{sum=$1} END{print sum}')
-    fail "Stale build dir(s) found (>1 day old, possibly from an interrupted build):"
-    echo "$STALE_TMP"
+    fail "Stale build dir(s) found (>1 day old, possibly from an interrupted build): $STALE_TMP"
     info "Review and remove manually with: sudo rm -rf <path>"
 fi
 
