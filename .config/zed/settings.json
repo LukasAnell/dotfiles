@@ -8,13 +8,7 @@
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
     "context_servers": {
-        "mcp-server-markitdown": {
-            "enabled": true,
-            "remote": false,
-            "settings": {
-                "package_version": "latest"
-            }
-        }
+        
     },
     "agent_servers": {
         "github-copilot-cli": {

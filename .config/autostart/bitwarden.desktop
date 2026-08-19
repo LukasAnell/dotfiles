@@ -1,8 +1,7 @@
 [Desktop Entry]
-  Type=Application
-  Version=2026.4.0
-  Name=Bitwarden
-  Comment=Bitwarden startup script
-  Exec=/tmp/.mount_BitwarHpUWNG/bitwarden-app
-  StartupNotify=false
-  Terminal=false
+Type=Application
+Name=Bitwarden
+Comment=Bitwarden startup script
+Exec=/tmp/.mount_BitwarUnvqbt/bitwarden-app --autostart
+StartupNotify=false
+Terminal=false

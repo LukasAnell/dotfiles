@@ -53,3 +53,4 @@ alias javac='javac -Xlint:all -Werror'
 # Tailscale Exit Node
 alias vpn-on='sudo tailscale set --exit-node=general-use-instance'
 alias vpn-off='sudo tailscale set --exit-node='
+export PATH=~/.npm-global/bin:$PATH
